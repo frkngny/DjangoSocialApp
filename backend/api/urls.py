@@ -17,7 +17,7 @@ urlpatterns = [
     # Room
     path('rooms', RoomView.as_view()),
     path('create-room', CreateRoomView.as_view()),
-    path('join-room', JoinRoomView.as_view()),
-    path('room-messages', RoomChatView.as_view(), name='room_chat'),
+    path('join-room', JoinRoomView.as_view()), #?code
+    path('room-messages', RoomChatView.as_view(), name='room_chat'), # ?room_code
     path('send-room-message', SendRoomMessageView.as_view(), name='send_room_message'), 
 ]
