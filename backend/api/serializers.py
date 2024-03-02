@@ -59,3 +59,8 @@ class UpdateUserActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserActivity
         fields = ['status', 'listening_to']
+
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = '__all__'
