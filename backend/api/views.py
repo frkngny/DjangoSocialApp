@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Q
 from .models import *
 from .serializers import *
 from rest_framework import generics, status
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
+# User and Profile
 class UserView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -72,7 +74,6 @@ class UserActivityUpdateView(APIView):
             else:
                 return Response({"Bad Request": f"User with given '{self.lookup_kwarg}' is not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(UserActivitySerializer(UserActivity.objects.all(), many=True).data)
-
     
     def put(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -93,6 +94,19 @@ class UserActivityUpdateView(APIView):
             return Response({"Bad request": f"'{self.lookup_kwarg}' is not given as parameter."}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"Bad request": "Invalid data."}, status=status.HTTP_400_BAD_REQUEST)
 
+## User search
+class UserSearchView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    def list(self, request):
+        username = request.query_params.get('username')
+        users = self.queryset.filter(Q(user__username__icontains=username) | Q(full_name__icontains=username))
+        if not users.exists():
+            return Response({'Message': 'No user found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer_class(users, many=True)
+        return Response(serializer.data)
+
+# Room
 class RoomView(generics.ListAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
@@ -122,3 +136,14 @@ class JoinRoomView(APIView):
                 return Response({'Message': 'Joined to room.'}, status=status.HTTP_200_OK)
             return Response({'Bad request': 'Room does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'Bad request': 'Please enter a valid code.'}, status=status.HTTP_404_NOT_FOUND)
+
+class SendRoomMessageView(generics.CreateAPIView):
+    serializer_class = RoomChatMessageSerializer
+
+## Room Chat
+class RoomChatView(generics.ListAPIView):
+    serializer_class = RoomChatMessageSerializer
+    def get_queryset(self):
+        room_code = self.request.query_params.get('room_code')
+        messages = RoomChatMessage.objects.filter(room__code=room_code)
+        return messages

@@ -15,7 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'full_name', 'bio', 'image']
+        fields = ['id', 'user', 'full_name', 'bio', 'image', 'friends']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -60,7 +60,19 @@ class UpdateUserActivitySerializer(serializers.ModelSerializer):
         model = UserActivity
         fields = ['status', 'listening_to']
 
+class UserRelationshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserRelationship
+        fields = '__all__'
+
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = '__all__'
+
+class RoomChatMessageSerializer(serializers.ModelSerializer):
+    room_ = RoomSerializer(read_only=True)
+    sender_ = UserSerializer(read_only=True)
+    class Meta:
+        model = RoomChatMessage
+        fields = ['id', 'room', 'room_', 'sender', 'sender_', 'message', 'date']

@@ -12,9 +12,12 @@ urlpatterns = [
     path('token-refresh', TokenRefreshView.as_view(), name='user_token_refresh'),
     path('user-activity', UserActivityView.as_view()), # user-activity?user_id=1 can be used to get a user's activity
     path('user-activity/update', UserActivityUpdateView.as_view()), # user-activity?user_id=1 will be used to update a user
+    path('search-user', UserSearchView.as_view()),
 
     # Room
     path('rooms', RoomView.as_view()),
     path('create-room', CreateRoomView.as_view()),
     path('join-room', JoinRoomView.as_view()),
+    path('room-messages', RoomChatView.as_view(), name='room_chat'),
+    path('send-room-message', SendRoomMessageView.as_view(), name='send_room_message'), 
 ]
