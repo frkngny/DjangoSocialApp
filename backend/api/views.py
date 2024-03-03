@@ -4,7 +4,7 @@ from .models import *
 from .serializers import *
 from rest_framework import generics, status
 from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -18,10 +18,12 @@ class UserView(generics.ListAPIView):
 class ProfileCreateView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
+    permission_classes = [IsAuthenticated]
 
 class ProfileView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
+    #permission_classes = [IsAuthenticated]
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -34,13 +36,14 @@ class UserTokenObtainView(TokenObtainPairView):
 class UserActivityView(APIView):
     serializer_class = UserActivitySerializer
     lookup_kwarg = 'user_id'
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         if request.GET.get(self.lookup_kwarg):
-            queryset = UserActivity.objects.get(user=request.GET.get(self.lookup_kwarg))
+            queryset = UserActivity.objects.filter(user=request.GET.get(self.lookup_kwarg))
             if queryset.exists():
-                data = UserActivitySerializer(queryset[0]).data
-                return Response(data)
+                return Response(UserActivitySerializer(queryset[0]).data)
+            return Response({"Bad request": "User activity not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response(UserActivitySerializer(UserActivity.objects.all(), many=True).data)
     
     def post(self, request):
@@ -50,10 +53,9 @@ class UserActivityView(APIView):
             user_status = serializer.data.get('status')
             listening_to = serializer.data.get('listening_to')
             queryset = UserActivity.objects.get(user=user_id)
-            if not queryset.exists():
+            if queryset:
                 user = User.objects.get(id=user_id)
-                if user.exists():
-                    user = user[0]
+                if user:
                     user_activity = UserActivity(user=user, status=user_status, listening_to=listening_to)
                     user_activity.save()
                     return Response(UserActivitySerializer(user_activity).data, status=status.HTTP_201_CREATED)
@@ -64,6 +66,7 @@ class UserActivityView(APIView):
 class UserActivityUpdateView(APIView):
     serializer_class = UpdateUserActivitySerializer
     lookup_kwarg = 'user_id'
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         if request.GET.get(self.lookup_kwarg):
@@ -98,6 +101,7 @@ class UserActivityUpdateView(APIView):
 class UserSearchView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
+    permission_classes = [IsAuthenticated]
     def list(self, request):
         username = request.query_params.get('username')
         users = self.queryset.filter(Q(user__username__icontains=username) | Q(full_name__icontains=username))
@@ -110,10 +114,11 @@ class UserSearchView(generics.ListAPIView):
 class RoomView(generics.ListAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
+    permission_classes = [IsAuthenticated]
 
 class CreateRoomView(APIView):
     serializer_class = RoomSerializer
-
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -126,7 +131,7 @@ class CreateRoomView(APIView):
 
 class JoinRoomView(APIView):
     serializer_class = RoomSerializer
-
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         code = request.data.get('code')
         if code:
@@ -139,10 +144,12 @@ class JoinRoomView(APIView):
 
 class SendRoomMessageView(generics.CreateAPIView):
     serializer_class = RoomChatMessageSerializer
+    permission_classes = [IsAuthenticated]
 
 ## Room Chat
 class RoomChatView(generics.ListAPIView):
     serializer_class = RoomChatMessageSerializer
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         room_code = self.request.query_params.get('room_code')
         messages = RoomChatMessage.objects.filter(room__code=room_code)

@@ -1,15 +1,16 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import UserRelationship, User, Profile
+from .models import UserRelationship, User, Profile, UserActivity, STATUS_CHOICES
 
 
 @receiver(post_save, sender=User)
 def post_save_create_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+        UserActivity.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
-def post_save_update_profile(sender, instance, **kwargs):
+def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 @receiver(post_save, sender=UserRelationship)

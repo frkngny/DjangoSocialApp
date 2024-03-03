@@ -49,7 +49,7 @@ class Profile(models.Model):
 
 class UserActivity(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="offline")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="online")
     listening_to = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self) -> str:

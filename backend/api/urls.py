@@ -7,7 +7,8 @@ urlpatterns = [
     path('users', UserView.as_view()),
     path('profile-create', ProfileCreateView.as_view()),
     path('profiles', ProfileView.as_view()),
-    path('register', RegisterView.as_view()),
+    path('profile/<int:pk>', ProfileCreateView.as_view()),
+    path('register', RegisterView.as_view(), name='register'),
     path('token', UserTokenObtainView.as_view(), name='user_token_obtain'),
     path('token-refresh', TokenRefreshView.as_view(), name='user_token_refresh'),
     path('user-activity', UserActivityView.as_view()), # user-activity?user_id=1 can be used to get a user's activity
