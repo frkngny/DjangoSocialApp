@@ -1,15 +1,16 @@
+### backend
 __pycache__/
 .venv/
-
-
-node_modules/
 migrations/
 credentials.py
 db.sqlite3
 user.png
+backend/media/
+
 
 ### frontend
 # dependencies
+node_modules/
 /node_modules
 /.pnp
 .pnp.js

@@ -18,7 +18,7 @@ function Navbar() {
 
     return (
         <div className='custom-nav'>
-            <nav className="navbar navbar-expand-lg navbar-dark sticky-top bg-dark">
+            <nav className="navbar navbar-expand-lg navbar-dark sticky-top bg-dark" style={{opacity: .8}}>
                 <div className="container-fluid">
                     <a className="navbar-brand" href="#">
                         <img style={{ width: "120px", padding: "6px" }} src="" alt="" />
@@ -59,13 +59,14 @@ function Navbar() {
                     </div>
                     { token !== null && 
                         <div className='d-flex'>
-                            <a href="/profile">
+                            <a href={"/profile/" + user.username}>
                                 <Avatar alt="" src={userImage} />
                             </a>
                         </div>
                     }
                 </div>
             </nav>
+            <br/>
         </div>
     )
 }
