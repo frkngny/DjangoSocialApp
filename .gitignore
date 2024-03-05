@@ -1,5 +1,5 @@
 __pycache__/
-venv/
+.venv/
 
 
 node_modules/
@@ -7,7 +7,6 @@ migrations/
 credentials.py
 db.sqlite3
 user.png
-
 
 ### frontend
 # dependencies
